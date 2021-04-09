@@ -10,9 +10,9 @@ data class MastermindState(val placed: Int = 0, val misplaced: Int = 0) {
     fun addMisplaced() = MastermindState(placed, misplaced + 1)
 }
 
-enum class PlacementType { Placed, Misplaced, Absent }
-
 class MastermindAttemptChecker(private val solution: String) {
+    enum class PlacementType { Placed, Misplaced, Absent }
+
     fun process(attempt: String): MastermindState {
         return attempt.foldIndexed(MastermindState()) { index, mastermindState, char ->
             when (processChar(index, char)) {
@@ -24,17 +24,17 @@ class MastermindAttemptChecker(private val solution: String) {
     }
 
     private fun processChar(index: Int, char: Char): PlacementType {
+        fun isPlaced() = solution[index] == char
+        fun isPresent() = remainingCountsByChar.getOrElse(char) { 0 } > 0
+
         val charPlacementType = when {
-            isPlaced(index, char) -> PlacementType.Placed
-            isPresent(char) -> PlacementType.Misplaced
+            isPlaced() -> PlacementType.Placed
+            isPresent() -> PlacementType.Misplaced
             else -> PlacementType.Absent
         }
         removeCharFromCounts(char)
         return charPlacementType
     }
-
-    private fun isPlaced(index: Int, char: Char) = solution[index] == char
-    private fun isPresent(char: Char) = remainingCountsByChar.getOrElse(char) { 0 } > 0
 
     private val remainingCountsByChar: MutableMap<Char, Int> = mutableMapOf(
         *solution.groupBy { it }
