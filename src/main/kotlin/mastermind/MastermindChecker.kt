@@ -10,10 +10,9 @@ enum class PlacementType { Placed, Misplaced, Absent }
 
 class MastermindAttemptChecker(val solution: String) {
     fun process(attempt: String): MastermindState {
-        val (placed, misplaced) = attempt.withIndex()
-            .map { (index, char) -> processChar(index, char) }
-            .fold(0 to 0) { (placed, misplaced), placementType ->
-                when (placementType) {
+        val (placed, misplaced) = attempt
+            .foldIndexed(0 to 0) { index, (placed, misplaced), char ->
+                when (processChar(index, char)) {
                     PlacementType.Placed -> placed + 1 to misplaced
                     PlacementType.Misplaced -> placed to misplaced + 1
                     PlacementType.Absent -> placed to misplaced
