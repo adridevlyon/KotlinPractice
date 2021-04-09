@@ -12,10 +12,9 @@ class MastermindChecker {
 
 class MastermindState(val solution: String, var placed: Int = 0, var present: Int = 0) {
     fun process(index: Int, char: Char) {
-        if (isPlaced(index, char)) {
-            addPlaced(char)
-        } else if (isPresent(char)) {
-            addPresent(char)
+        when {
+            isPlaced(index, char) -> addPlaced(char)
+            isPresent(char) -> addPresent(char)
         }
     }
 
