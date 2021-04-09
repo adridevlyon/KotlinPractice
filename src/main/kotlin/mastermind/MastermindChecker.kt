@@ -5,9 +5,9 @@ fun check(attempt: String, solution: String): MastermindState {
     return attemptChecker.process(attempt)
 }
 
-data class MastermindState(val placed: Int = 0, val present: Int = 0) {
-    fun addPlaced() = MastermindState(placed + 1, present)
-    fun addMisplaced() = MastermindState(placed, present + 1)
+data class MastermindState(val placed: Int = 0, val misplaced: Int = 0) {
+    fun addPlaced() = MastermindState(placed + 1, misplaced)
+    fun addMisplaced() = MastermindState(placed, misplaced + 1)
 }
 
 enum class PlacementType { Placed, Misplaced, Absent }

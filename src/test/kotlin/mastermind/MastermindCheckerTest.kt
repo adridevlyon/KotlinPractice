@@ -16,7 +16,7 @@ class MastermindCheckerTest {
         val mastermindState = check(attempt, solution)
 
         assertSame(4, mastermindState.placed)
-        assertSame(0, mastermindState.present)
+        assertSame(0, mastermindState.misplaced)
     }
 
     @ParameterizedTest
@@ -25,7 +25,7 @@ class MastermindCheckerTest {
         val mastermindState = check(attempt, solution)
 
         assertSame(0, mastermindState.placed)
-        assertSame(0, mastermindState.present)
+        assertSame(0, mastermindState.misplaced)
     }
 
     @ParameterizedTest
@@ -34,7 +34,7 @@ class MastermindCheckerTest {
         val mastermindState = check(attempt, solution)
 
         assertSame(placed, mastermindState.placed)
-        assertSame(present, mastermindState.present)
+        assertSame(present, mastermindState.misplaced)
     }
 }
 
