@@ -45,10 +45,10 @@ class MastermindState(val solution: String, var placed: Int = 0, var present: In
 
     private val itemsByType: MutableMap<Char, Int> = computeItemsByType(solution)
     private fun computeItemsByType(solution: String): MutableMap<Char, Int> {
-        val itemsByType = mutableMapOf<Char, Int>()
-        for (ch in solution) {
-            itemsByType[ch] = itemsByType.getOrDefault(ch, 0) + 1
-        }
-        return itemsByType
+        return mutableMapOf(
+            *solution.groupBy { it }
+                .map { (char, chars) -> char to chars.size }
+                .toTypedArray()
+        )
     }
 }
