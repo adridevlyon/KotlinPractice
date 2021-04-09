@@ -5,9 +5,7 @@ import kotlin.math.max
 class MastermindChecker {
     fun check(attempt: String, solution: String): MastermindState {
         val mastermindState = MastermindState(solution = solution)
-        for ((index, char) in attempt.withIndex()) {
-            mastermindState.process(index, char)
-        }
+        attempt.withIndex().forEach { (index, char) -> mastermindState.process(index, char) }
         return mastermindState
     }
 }
