@@ -1,7 +1,5 @@
 package mastermind
 
-import kotlin.math.max
-
 class MastermindChecker {
     fun check(attempt: String, solution: String): MastermindState {
         val mastermindState = MastermindState(solution = solution)
@@ -28,7 +26,7 @@ class MastermindState(val solution: String, var placed: Int = 0, var present: In
     }
 
     private fun isPresent(char: Char): Boolean {
-        return solutionCountsByChar.getOrDefault(char, 0) > 0
+        return solutionCountsByChar.getOrElse(char) { 0 } > 0
     }
 
     private fun addPresent(char: Char) {
@@ -37,7 +35,10 @@ class MastermindState(val solution: String, var placed: Int = 0, var present: In
     }
 
     private fun removeCharFromCounts(char: Char) {
-        solutionCountsByChar[char] = max(0, solutionCountsByChar.getOrDefault(char, 0) - 1)
+        if (char !in solutionCountsByChar) return
+        if (solutionCountsByChar[char] == 0) return
+
+        solutionCountsByChar[char] = solutionCountsByChar.getOrElse(char) { 0 } - 1
     }
 
     private val solutionCountsByChar: MutableMap<Char, Int> = computeCountsByChar(solution)
