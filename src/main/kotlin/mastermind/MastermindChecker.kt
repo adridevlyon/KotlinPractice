@@ -16,6 +16,8 @@ class MastermindState(val solution: String, var placed: Int = 0, var present: In
     fun process(index: Int, item: Char) {
         if (isPlaced(index, item)) {
             addPlaced(item)
+        } else if (isPresent(item)) {
+            addPresent(item)
         }
     }
 
@@ -25,6 +27,15 @@ class MastermindState(val solution: String, var placed: Int = 0, var present: In
 
     private fun addPlaced(item: Char) {
         placed++
+        removeFromItemsByType(item)
+    }
+
+    private fun isPresent(item: Char): Boolean {
+        return itemsByType.getOrDefault(item, 0) > 0
+    }
+
+    private fun addPresent(item: Char) {
+        present++
         removeFromItemsByType(item)
     }
 
