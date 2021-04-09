@@ -1,11 +1,9 @@
 package mastermind
 
-class MastermindChecker {
-    fun check(attempt: String, solution: String): MastermindState {
-        val mastermindState = MastermindState(solution = solution)
-        attempt.withIndex().forEach { (index, char) -> mastermindState.process(index, char) }
-        return mastermindState
-    }
+fun check(attempt: String, solution: String): MastermindState {
+    val mastermindState = MastermindState(solution = solution)
+    attempt.withIndex().forEach { (index, char) -> mastermindState.process(index, char) }
+    return mastermindState
 }
 
 class MastermindState(val solution: String, var placed: Int = 0, var present: Int = 0) {
