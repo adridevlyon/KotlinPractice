@@ -10,8 +10,10 @@ data class MastermindState(val placed: Int = 0, val misplaced: Int = 0) {
     fun addMisplaced() = MastermindState(placed, misplaced + 1)
 }
 
-class MastermindAttemptChecker(private val solution: String) {
-    enum class PlacementType { Placed, Misplaced, Absent }
+class MastermindAttemptChecker(solution: String) {
+    private val solutionPlaces: MastermindSolutionPlaces = MastermindSolutionPlaces(solution)
+
+    private enum class PlacementType { Placed, Misplaced, Absent }
 
     fun process(attempt: String): MastermindState {
         return attempt.foldIndexed(MastermindState()) { index, mastermindState, char ->
@@ -24,28 +26,32 @@ class MastermindAttemptChecker(private val solution: String) {
     }
 
     private fun processChar(index: Int, char: Char): PlacementType {
-        fun isPlaced() = solution[index] == char
-        fun isPresent() = remainingCountsByChar.getOrElse(char) { 0 } > 0
-
         val charPlacementType = when {
-            isPlaced() -> PlacementType.Placed
-            isPresent() -> PlacementType.Misplaced
+            solutionPlaces.isPlaced(index, char) -> PlacementType.Placed
+            solutionPlaces.isPresent(char) -> PlacementType.Misplaced
             else -> PlacementType.Absent
         }
-        removeCharFromCounts(char)
+        solutionPlaces.addSeen(char)
         return charPlacementType
     }
+}
 
-    private val remainingCountsByChar: MutableMap<Char, Int> = mutableMapOf(
-        *solution.groupBy { it }
-            .map { (char, chars) -> char to chars.size }
-            .toTypedArray()
-    )
+class MastermindSolutionPlaces(private val solution: String) {
+    data class MastermindItemWithPlaces(val char: Char, private val total: Int = 0) {
+        private var seen: Int = 0
 
-    private fun removeCharFromCounts(char: Char) {
-        if (char !in remainingCountsByChar) return
-        if (remainingCountsByChar[char] == 0) return
+        fun hasUnseen() = total - seen > 0
+        fun addSeen() = seen++
+    }
 
-        remainingCountsByChar[char] = remainingCountsByChar.getOrElse(char) { 0 } - 1
+    private val itemsWithPlaces: List<MastermindItemWithPlaces> = solution.groupBy { it }
+        .map { (char, chars) -> MastermindItemWithPlaces(char, chars.size) }
+
+    fun isPlaced(index: Int, char: Char) = solution[index] == char
+    fun isPresent(char: Char) = getItem(char)?.hasUnseen() ?: false
+    fun addSeen(char: Char) = getItem(char)?.addSeen()
+
+    private fun getItem(char: Char): MastermindItemWithPlaces? {
+        return itemsWithPlaces.firstOrNull { it.char == char }
     }
 }
