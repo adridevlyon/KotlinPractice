@@ -1,44 +1,50 @@
 package mastermind
 
 fun check(attempt: String, solution: String): MastermindState {
-    val attemptChecker = MastermindAttemptChecker(solution = solution)
+    val attemptChecker = MastermindAttemptChecker(solution)
     return attemptChecker.process(attempt)
 }
 
 data class MastermindState(val placed: Int, val present: Int)
+enum class PlacementType { Placed, Misplaced, Absent }
 
 class MastermindAttemptChecker(val solution: String) {
     fun process(attempt: String): MastermindState {
-        val processedChars = attempt.withIndex().map { (index, char) -> processChar(index, char) }
-        val (placedChars, presentChars) = processedChars
-            .filter { (placed, present) -> placed + present > 0 }
-            .partition { (placed, _) -> placed > 0 }
-        return MastermindState(placedChars.size, presentChars.size)
+        val (placed, misplaced) = attempt.withIndex()
+            .map { (index, char) -> processChar(index, char) }
+            .fold(0 to 0) { (placed, misplaced), placementType ->
+                when (placementType) {
+                    PlacementType.Placed -> placed + 1 to misplaced
+                    PlacementType.Misplaced -> placed to misplaced + 1
+                    PlacementType.Absent -> placed to misplaced
+                }
+            }
+        return MastermindState(placed, misplaced)
     }
 
-    private fun processChar(index: Int, char: Char): Pair<Int, Int> {
-        val (placed, present) = when {
-            isPlaced(index, char) -> 1 to 0
-            isPresent(char) -> 0 to 1
-            else -> 0 to 0
+    private fun processChar(index: Int, char: Char): PlacementType {
+        val charPlacementType = when {
+            isPlaced(index, char) -> PlacementType.Placed
+            isPresent(char) -> PlacementType.Misplaced
+            else -> PlacementType.Absent
         }
         removeCharFromCounts(char)
-        return placed to present
+        return charPlacementType
     }
 
     private fun isPlaced(index: Int, char: Char) = solution[index] == char
-    private fun isPresent(char: Char) = solutionCountsByChar.getOrElse(char) { 0 } > 0
+    private fun isPresent(char: Char) = remainingCountsByChar.getOrElse(char) { 0 } > 0
 
-    private val solutionCountsByChar: MutableMap<Char, Int> = mutableMapOf(
+    private val remainingCountsByChar: MutableMap<Char, Int> = mutableMapOf(
         *solution.groupBy { it }
             .map { (char, chars) -> char to chars.size }
             .toTypedArray()
     )
 
     private fun removeCharFromCounts(char: Char) {
-        if (char !in solutionCountsByChar) return
-        if (solutionCountsByChar[char] == 0) return
+        if (char !in remainingCountsByChar) return
+        if (remainingCountsByChar[char] == 0) return
 
-        solutionCountsByChar[char] = solutionCountsByChar.getOrElse(char) { 0 } - 1
+        remainingCountsByChar[char] = remainingCountsByChar.getOrElse(char) { 0 } - 1
     }
 }
