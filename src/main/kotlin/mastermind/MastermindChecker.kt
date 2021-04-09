@@ -12,7 +12,7 @@ data class MastermindState(val placed: Int = 0, val misplaced: Int = 0) {
 
 enum class PlacementType { Placed, Misplaced, Absent }
 
-class MastermindAttemptChecker(val solution: String) {
+class MastermindAttemptChecker(private val solution: String) {
     fun process(attempt: String): MastermindState {
         return attempt.foldIndexed(MastermindState()) { index, mastermindState, char ->
             when (processChar(index, char)) {
