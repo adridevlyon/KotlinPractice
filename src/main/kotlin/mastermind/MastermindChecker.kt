@@ -5,20 +5,22 @@ fun check(attempt: String, solution: String): MastermindState {
     return attemptChecker.process(attempt)
 }
 
-data class MastermindState(val placed: Int, val present: Int)
+data class MastermindState(val placed: Int = 0, val present: Int = 0) {
+    fun addPlaced() = MastermindState(placed + 1, present)
+    fun addMisplaced() = MastermindState(placed, present + 1)
+}
+
 enum class PlacementType { Placed, Misplaced, Absent }
 
 class MastermindAttemptChecker(val solution: String) {
     fun process(attempt: String): MastermindState {
-        val (placed, misplaced) = attempt
-            .foldIndexed(0 to 0) { index, (placed, misplaced), char ->
-                when (processChar(index, char)) {
-                    PlacementType.Placed -> placed + 1 to misplaced
-                    PlacementType.Misplaced -> placed to misplaced + 1
-                    PlacementType.Absent -> placed to misplaced
-                }
+        return attempt.foldIndexed(MastermindState()) { index, mastermindState, char ->
+            when (processChar(index, char)) {
+                PlacementType.Placed -> mastermindState.addPlaced()
+                PlacementType.Misplaced -> mastermindState.addMisplaced()
+                PlacementType.Absent -> mastermindState
             }
-        return MastermindState(placed, misplaced)
+        }
     }
 
     private fun processChar(index: Int, char: Char): PlacementType {
